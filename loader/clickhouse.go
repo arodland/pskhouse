@@ -49,26 +49,51 @@ func insertData(ctx context.Context, cancel context.CancelCauseFunc, reports <-c
 		cancel(err)
 		return
 	}
-	for report := range reports {
-		row, err := convertRow(report)
-		if err != nil {
-			log.Warn().Err(err).Interface("report", report).Msg("converting report")
-			continue
-		}
-		batch, err := conn.PrepareBatch(ctx, "INSERT INTO "+config.ClickhouseTable)
-		if err != nil {
-			cancel(fmt.Errorf("preparing batch: %w", err))
-			return
-		}
-		err = batch.AppendStruct(row)
-		if err != nil {
-			log.Error().Err(err).Interface("row", row).Msg("appending row to batch")
-			continue
-		}
-		err = batch.Send()
-		if err != nil {
-			cancel(fmt.Errorf("sending batch: %w", err))
-			return
+
+	insertStmt := "INSERT INTO " + config.ClickhouseTable
+	batch, err := conn.PrepareBatch(ctx, insertStmt)
+	if err != nil {
+		cancel(fmt.Errorf("preparing initial batch: %w", err))
+		return
+	}
+
+	flushTicker := time.NewTicker(config.FlushFrequency)
+	defer flushTicker.Stop()
+
+	for {
+		select {
+		case report := <-reports:
+			row, err := convertRow(report)
+			if err != nil {
+				log.Warn().Err(err).Interface("report", report).Msg("converting report")
+				continue
+			}
+			err = batch.AppendStruct(row)
+			if err != nil {
+				log.Error().Err(err).Interface("row", row).Msg("appending row to batch")
+				continue
+			}
+		case <-flushTicker.C:
+			if batch.Rows() > 0 {
+				err = batch.Send()
+				if err != nil {
+					cancel(fmt.Errorf("flushing batch: %w", err))
+					return
+				}
+				batch, err = conn.PrepareBatch(ctx, insertStmt)
+				if err != nil {
+					cancel(fmt.Errorf("preparing new batch: %w", err))
+					return
+				}
+			}
+		case <-ctx.Done():
+			if batch != nil && batch.Rows() > 0 {
+				err = batch.Send()
+				if err != nil {
+					log.Error().Err(err).Msg("flushing final batch")
+				}
+				return
+			}
 		}
 	}
 }

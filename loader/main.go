@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
@@ -13,12 +14,13 @@ import (
 )
 
 type Config struct {
-	ClickhouseAddr     string `dialsdesc:"ClickHouse database host[:port]"`
-	ClickhouseDB       string `dialsdesc:"ClickHouse database name"`
-	ClickhouseUsername string `dialsdesc:"ClickHouse username"`
-	ClickhousePassword string `dialsdesc:"ClickHouse password"`
-	ClickhouseTable    string `dialsdesc:"Table to insert reports into"`
-	PSKReporterToken   string `dialsdesc:"PSKReporter stream token"`
+	ClickhouseAddr     string        `dialsdesc:"ClickHouse database host[:port]"`
+	ClickhouseDB       string        `dialsdesc:"ClickHouse database name"`
+	ClickhouseUsername string        `dialsdesc:"ClickHouse username"`
+	ClickhousePassword string        `dialsdesc:"ClickHouse password"`
+	ClickhouseTable    string        `dialsdesc:"Table to insert reports into"`
+	PSKReporterToken   string        `dialsdesc:"PSKReporter stream token"`
+	FlushFrequency     time.Duration `dialsdesc:"How often to commit data to the DB"`
 }
 
 func defaultConfig() *Config {
@@ -27,6 +29,7 @@ func defaultConfig() *Config {
 		ClickhouseDB:       "pskhouse",
 		ClickhouseUsername: "pskhouse",
 		ClickhouseTable:    "rx",
+		FlushFrequency:     time.Second,
 	}
 }
 
