@@ -1,0 +1,13 @@
+[Unit]
+Description=Podman Pod for PSKHouse
+PartOf=pskhouse.target
+
+[Install]
+WantedBy=pskhouse.target
+
+[Pod]
+PodName=pskhouse
+PublishPort=127.0.0.1:5530-5539:5530-5539
+PublishPort=127.0.0.1:8123:8123
+PublishPort=127.0.0.1:9000:9000
+ServiceName=pskhouse-pod

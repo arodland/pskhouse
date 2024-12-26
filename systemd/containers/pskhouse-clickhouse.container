@@ -1,0 +1,17 @@
+[Unit]
+Description=PSKHouse ClickHouse
+BindsTo=pskhouse-pod.service
+PartOf=pskhouse.target
+
+[Install]
+WantedBy=pskhouse.target
+
+[Container]
+Pod=pskhouse.pod
+ContainerName=%N
+CgroupsMode=no-conmon
+EnvironmentFile=/etc/pskhouse/db.env
+Ulimit=nofile=262144:262144
+Mount=type=bind,src=/storage/pskhouse/clickhouse,dst=/var/lib/clickhouse
+Mount=type=bind,src=/storage/pskhouse/log,dst=/var/log/clickhouse-server
+Image=clickhouse/clickhouse-server:24.8-alpine
