@@ -21,6 +21,7 @@ type Config struct {
 	ClickhouseTable    string        `dialsdesc:"Table to insert reports into"`
 	PSKReporterToken   string        `dialsdesc:"PSKReporter stream token"`
 	FlushFrequency     time.Duration `dialsdesc:"How often to commit data to the DB"`
+	MetricsPort        int           `dialsdesc:"Port to listen on for metrics"`
 }
 
 func defaultConfig() *Config {
@@ -30,6 +31,7 @@ func defaultConfig() *Config {
 		ClickhouseUsername: "pskhouse",
 		ClickhouseTable:    "rx",
 		FlushFrequency:     time.Second,
+		MetricsPort:        9001,
 	}
 }
 
@@ -54,6 +56,9 @@ func main() {
 		log.Fatal().Err(err).Msg("setting dials config")
 	}
 	config = d.View()
+
+	initMetrics()
+	go metricsServer()
 
 	reports := make(chan *Report, 100)
 	go processStream(ctx, cancel, reports)

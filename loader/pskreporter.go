@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/rs/zerolog/log"
+	"go.opencensus.io/stats"
+	"go.opencensus.io/tag"
 )
 
 type Report struct {
@@ -44,6 +47,9 @@ func processStream(ctx context.Context, cancel context.CancelCauseFunc, reports 
 			cancel(fmt.Errorf("executing pskreporter request: %w", err))
 			return
 		}
+		stats.RecordWithTags(ctx, []tag.Mutator{tag.Upsert(StatusCode, strconv.Itoa(res.StatusCode))},
+			PskReporterStatus.M(1))
+
 		if res.StatusCode != 200 {
 			err := fmt.Errorf("got status code %d from pskreporter", res.StatusCode)
 			cancel(err)
@@ -53,8 +59,10 @@ func processStream(ctx context.Context, cancel context.CancelCauseFunc, reports 
 		for lines.Scan() {
 			report := &Report{}
 			err := json.Unmarshal([]byte(lines.Text()), report)
+			stats.Record(ctx, PskReporterLinesRead.M(1))
 			if err != nil {
 				log.Warn().Err(err).Msg("decoding report")
+				stats.Record(ctx, PskReporterInvalidLines.M(1))
 				continue
 			}
 			reports <- report

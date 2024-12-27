@@ -9,6 +9,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2"
 	maidenhead "github.com/pd0mz/go-maidenhead"
 	"github.com/rs/zerolog/log"
+	"go.opencensus.io/stats"
 )
 
 type ClickhouseRow struct {
@@ -66,6 +67,7 @@ func insertData(ctx context.Context, cancel context.CancelCauseFunc, reports <-c
 			row, err := convertRow(report)
 			if err != nil {
 				log.Warn().Err(err).Interface("report", report).Msg("converting report")
+				stats.Record(ctx, ClickHouseConvertErrors.M(1))
 				continue
 			}
 			err = batch.AppendStruct(row)
@@ -74,9 +76,15 @@ func insertData(ctx context.Context, cancel context.CancelCauseFunc, reports <-c
 				continue
 			}
 		case <-flushTicker.C:
-			if batch.Rows() > 0 {
+			if rows := batch.Rows(); rows > 0 {
+				stats.Record(ctx,
+					ClickHouseBatches.M(1),
+					ClickHouseRows.M(int64(rows)),
+					ClickHouseBatchSize.M(float64(rows)),
+				)
 				err = batch.Send()
 				if err != nil {
+					stats.Record(ctx, ClickHouseInsertErrors.M(1))
 					cancel(fmt.Errorf("flushing batch: %w", err))
 					return
 				}
