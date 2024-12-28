@@ -44,3 +44,10 @@ Unit files are included in `systemd` for a Linux system with [Podman](https://po
 the clickhouse server and the loader together in a pod and manage them as a systemd target `pskhouse.target`. In such a
 case it expects the loader to exist as a local container image named `pskhouse-loader`, and it can be built using ko. If
 ClickHouse is being managed another way, it's perfectly fine to forego all of this and run the Go binary directly.
+
+## Examples!
+
+![A query showing most recent reports](https://github.com/user-attachments/assets/0c7e30b2-464e-4ccf-a4f7-cc1cf45aa799)
+
+
+![A query showing top spotters of the past 24 hours](https://github.com/user-attachments/assets/e7ecb663-37fb-4f42-aedf-ac9c44d8aff8)
