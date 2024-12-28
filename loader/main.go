@@ -23,6 +23,7 @@ type Config struct {
 	PSKReporterToken   string        `dialsdesc:"PSKReporter stream token"`
 	FlushFrequency     time.Duration `dialsdesc:"How often to commit data to the DB"`
 	MetricsPort        int           `dialsdesc:"Port to listen on for metrics"`
+	LogLevel           string        `dialsdesc:"Minimum level of messages to log to console"`
 }
 
 func defaultConfig() *Config {
@@ -33,6 +34,7 @@ func defaultConfig() *Config {
 		ClickhouseTable:    "rx",
 		FlushFrequency:     time.Second,
 		MetricsPort:        9001,
+		LogLevel:           "info",
 	}
 }
 
@@ -57,6 +59,12 @@ func main() {
 		log.Fatal().Err(err).Msg("setting dials config")
 	}
 	config = d.View()
+
+	logLevel, err := zerolog.ParseLevel(config.LogLevel)
+	if err != nil {
+		log.Fatal().Msgf("Unknown log level: %s")
+	}
+	zerolog.SetGlobalLevel(logLevel)
 
 	initMetrics()
 	go metricsServer()

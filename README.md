@@ -36,6 +36,7 @@ from Philip Gladstone.
 `1m`). The default of `1s` is probably fine. More frequent flushing increases ClickHouse CPU usage. Reports are also
 flushed to the database on shutdown, unless the reason for the shutdown was a loss of database connection.
 * `-metrics-port` / `METRICS_PORT`: port to run an HTTP server with a Prometheus-compatible `/metrics` endpoint.
+* `-log-level` / `LOG_LEVEL`: minumum log level (verbosity): `trace`, `debug`, `info`, `warn`, `error`, `fatal`.
 
 ## Podman / Quadlet / Systemd
 
