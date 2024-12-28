@@ -7,10 +7,6 @@ After=pskhouse-clickhouse.service
 [Install]
 WantedBy=pskhouse.target
 
-[Service]
-EnvironmentFile=/etc/pskhouse/db.env
-EnvironmentFile=/etc/pskhouse/pskreporter.env
-
 [Container]
 Pod=pskhouse.pod
 ContainerName=%N
@@ -18,5 +14,5 @@ CgroupsMode=no-conmon
 EnvironmentFile=/etc/pskhouse/db.env
 EnvironmentFile=/etc/pskhouse/pskreporter.env
 Image=pskhouse-loader
-Exec=-psk-reporter-token ${PSKREPORTER_TOKEN} -clickhouse-password ${CLICKHOUSE_PASSWORD} -metrics-port 5530
+Exec=-metrics-port 5530
 LogDriver=journald

@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
 	"github.com/vimeo/dials"
+	"github.com/vimeo/dials/sources/env"
 	"github.com/vimeo/dials/sources/flag"
 )
 
@@ -51,7 +52,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("creating cmdlineset")
 	}
-	d, err := dials.Config(ctx, config, flagSrc)
+	d, err := dials.Config(ctx, config, &env.Source{}, flagSrc)
 	if err != nil {
 		log.Fatal().Err(err).Msg("setting dials config")
 	}
