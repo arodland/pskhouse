@@ -49,5 +49,4 @@ ClickHouse is being managed another way, it's perfectly fine to forego all of th
 
 ![A query showing most recent reports](https://github.com/user-attachments/assets/0c7e30b2-464e-4ccf-a4f7-cc1cf45aa799)
 
-
-![A query showing top spotters of the past 24 hours](https://github.com/user-attachments/assets/e7ecb663-37fb-4f42-aedf-ac9c44d8aff8)
+<img src="https://github.com/user-attachments/assets/e7ecb663-37fb-4f42-aedf-ac9c44d8aff8" alt="A query showing top spotters of the past 24 hours" width="499">
