@@ -45,6 +45,10 @@ the clickhouse server and the loader together in a pod and manage them as a syst
 case it expects the loader to exist as a local container image named `pskhouse-loader`, and it can be built using ko. If
 ClickHouse is being managed another way, it's perfectly fine to forego all of this and run the Go binary directly.
 
+## Monitoring
+
+Point Prometheus, VictoriaMetrics, Netdata, etc. at the `/metrics` endpoint on the `-metrics-port`, e.g. `http://localhost:9001/metrics` for the default setup. There will be some application-specific metrics about loader performance with a `github_com_arodland_pskhouse` prefix, as well as a variety of metrics provided by the Go runtime.
+
 ## Examples!
 
 ![A query showing most recent reports](https://github.com/user-attachments/assets/0c7e30b2-464e-4ccf-a4f7-cc1cf45aa799)
