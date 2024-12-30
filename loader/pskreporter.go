@@ -38,6 +38,7 @@ func processStream(ctx context.Context, cancel context.CancelCauseFunc, reports 
 	for {
 		url := "https://stream.pskreporter.info/stream/report?token=" + url.QueryEscape(config.PSKReporterToken)
 		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+		req.Header.Set("User-Agent", "PSKHouse https://github.com/arodland/pskhouse/")
 		if err != nil {
 			cancel(fmt.Errorf("building request: %w", err))
 			return
