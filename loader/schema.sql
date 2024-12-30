@@ -3,7 +3,7 @@ CREATE TABLE pskhouse.rx
     `id` UInt64,
     `time` DateTime,
     `band` Int16,
-    `mode` String,
+    `mode` LowCardinality(String),
     `rx_sign` String,
     `rx_lat` Float32,
     `rx_lon` Float32,
