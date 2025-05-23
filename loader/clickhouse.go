@@ -120,6 +120,10 @@ func convertRow(report *Report) (*ClickhouseRow, error) {
 		TXLoc:     report.SenderLocator,
 	}
 
+	if time.Since(row.Time) > 24*time.Hour {
+		return nil, fmt.Errorf("report is older than 24 hours, timestamp is probably corrupt")
+	}
+
 	switch {
 	case row.Frequency < 300e3:
 		row.Band = -1
